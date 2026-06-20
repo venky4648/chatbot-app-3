@@ -4,11 +4,7 @@ import { authenticateToken } from "../middleware/auth.js";
 import Session from "../models/Session.js";
 
 const router = express.Router();
-let groq;
-const getGroq = () => {
-  if (!groq) groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-  return groq;
-};
+
 
 // GET all sessions
 router.get("/sessions", authenticateToken, async (req, res) => {
@@ -108,6 +104,11 @@ router.delete("/sessions/:sessionId", authenticateToken, async (req, res) => {
 router.post("/sessions/:sessionId/message", authenticateToken, async (req, res) => {
   try {
     const { message } = req.body;
+    const apiKey = req.headers["x-groq-api-key"];
+
+    if (!apiKey?.trim())
+      return res.status(400).json({ error: "Groq API key is required. Please set it in the UI." });
+
     if (!message?.trim())
       return res.status(400).json({ error: "Message is required" });
 
@@ -138,8 +139,10 @@ router.post("/sessions/:sessionId/message", authenticateToken, async (req, res) 
     }
 
     let fullResponse = "";
+    
+    const groq = new Groq({ apiKey: apiKey.trim() });
 
-    const stream = await getGroq().chat.completions.create({
+    const stream = await groq.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       max_tokens: 1024,
       messages: [

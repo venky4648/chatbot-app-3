@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import MessageBubble from "../components/MessageBubble";
 
-const API = "http://localhost:5000";
+const API = "https://chatbot-app-3-1.onrender.com";
 
 export default function Chat() {
   const { user, token, logout } = useAuth();
@@ -13,6 +13,7 @@ export default function Chat() {
   const [activeSessionId, setActiveSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("groqApiKey") || "");
   const [isStreaming, setIsStreaming] = useState(false);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
@@ -25,7 +26,10 @@ export default function Chat() {
 
   // Always read from ref so async functions get latest token
   const headers = (json = false) => {
-    const h = { Authorization: `Bearer ${tokenRef.current}` };
+    const h = { 
+      Authorization: `Bearer ${tokenRef.current}`,
+      "x-groq-api-key": apiKey
+    };
     if (json) h["Content-Type"] = "application/json";
     return h;
   };
@@ -144,6 +148,10 @@ export default function Chat() {
     if (!text || isStreaming) return;
     if (!tokenRef.current) {
       setError("Not logged in — please refresh the page");
+      return;
+    }
+    if (!apiKey.trim()) {
+      setError("Please enter your Groq API Key in the sidebar before sending a message.");
       return;
     }
     setError("");
@@ -339,6 +347,20 @@ export default function Chat() {
               </div>
             ))
           )}
+        </div>
+
+        <div className="sidebar-settings" style={{ padding: "16px", borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+          <label style={{ fontSize: "12px", color: "rgba(255,255,255,0.7)", display: "block", marginBottom: "8px", fontWeight: "bold", textTransform: "uppercase", letterSpacing: "0.5px" }}>Groq API Key</label>
+          <input 
+            type="password" 
+            value={apiKey} 
+            onChange={(e) => {
+              setApiKey(e.target.value);
+              localStorage.setItem("groqApiKey", e.target.value);
+            }} 
+            placeholder="Enter your gsk_... key" 
+            style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(0,0,0,0.3)", color: "white", outline: "none", fontSize: "14px", boxSizing: "border-box" }} 
+          />
         </div>
 
         <div className="sidebar-footer">

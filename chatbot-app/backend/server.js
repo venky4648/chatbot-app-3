@@ -19,10 +19,6 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-if (!process.env.GROQ_API_KEY) {
-  console.error(" GROQ_API_KEY is missing in .env file!");
-  process.exit(1);
-}
 
 app.use(
   cors({

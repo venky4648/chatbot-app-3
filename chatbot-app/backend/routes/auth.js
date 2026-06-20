@@ -30,7 +30,7 @@ router.post("/register", async (req, res) => {
     const token = jwt.sign(
       { userId: user._id.toString(), username: user.username },
       JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "10h" }
     );
 
     res.status(201).json({ token, username: user.username });
@@ -61,7 +61,7 @@ router.post("/login", async (req, res) => {
     const token = jwt.sign(
       { userId: user._id.toString(), username: user.username },
       JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "10h" }
     );
 
     res.json({ token, username: user.username });

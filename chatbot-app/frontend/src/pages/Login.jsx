@@ -14,7 +14,8 @@ export default function Login() {
     setError("");
     setLoading(true);
 
-    const endpoint = isRegister ? "/api/auth/register" : "/api/auth/login";
+    const API = "https://chatbot-app-3-1.onrender.com";
+    const endpoint = isRegister ? `${API}/api/auth/register` : `${API}/api/auth/login`;
 
     try {
       const res = await fetch(endpoint, {
