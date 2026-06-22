@@ -22,7 +22,7 @@ if (!MONGO_URI) {
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ["http://localhost:3000", "https://chatbot-app-jade-nine.vercel.app"],
     credentials: true,
   })
 );
